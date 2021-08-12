@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AtualizarJogadorDto } from './dtos/atualizar-jogador.dto';
 import { CriarJogadorDto } from "./dtos/criar-jogador.dto";
 import { JogadorInterface } from './interfaces/jogador.interface';
 import { JogadoresService } from './jogadores.service';
+import { JogadoresValidacaoParametrosPipe } from './pipes/jogadores-validacao-parametros.pipe';
 
 @Controller('api/jogadores')
 export class JogadoresController {
@@ -9,22 +11,31 @@ export class JogadoresController {
     constructor(private readonly jogadoresService:JogadoresService){}
 
     @Post()
-    async criarAtualizarJogador(@Body() criarJogadorDto: CriarJogadorDto) {
-        await this.jogadoresService.criarAtualizarJogador(criarJogadorDto)
+    @UsePipes(ValidationPipe)
+    async criarJogador(@Body() criarJogadorDto: CriarJogadorDto) {
+        await this.jogadoresService.criarJogador(criarJogadorDto)
+    }
+
+    @Put(':_id')
+    @UsePipes(ValidationPipe)
+    async atualizarJogador(@Body() atualizarJogadorDto: AtualizarJogadorDto, @Param('_id', JogadoresValidacaoParametrosPipe) _id:string) {
+        await this.jogadoresService.atualizarJogador(_id, atualizarJogadorDto)
     }
 
     @Get()
-    async consultarJogadores(@Query('email') email:string):Promise<JogadorInterface | JogadorInterface[]>{
-        if(email){
-            return this.jogadoresService.consultarJogadores(email)
-        }else{
-            return this.jogadoresService.consultarJogadores();
-        }
+    async consultarJogadores():Promise<JogadorInterface[]>{
+        return this.jogadoresService.consultarJogadores();
     }
 
-    @Delete()
-    async removerJogador(@Query('id') id:string):Promise<void>{
-        this.jogadoresService.removerJogador(id)
+    @Get(':_id')
+    async consultarJogadorPeloId(@Param('_id', JogadoresValidacaoParametrosPipe) _id:string):Promise<JogadorInterface>{
+        return this.jogadoresService.consultarJogadorPeloId(_id);
+    }
+    
+
+    @Delete(':_id')
+    async removerJogador(@Param('_id', JogadoresValidacaoParametrosPipe) _id:string):Promise<any>{
+        return this.jogadoresService.removerJogador(_id)
     }
 
 }
