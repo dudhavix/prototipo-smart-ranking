@@ -1,13 +1,13 @@
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
 import { CategoriasService } from './categorias.service';
 import { CategoriasController } from './categorias.controller';
-/*
-https://docs.nestjs.com/modules
-*/
-
-import { Module } from '@nestjs/common';
+import { CategoriaSchema } from './interfaces/categoria.schema';
+import { JogadoresModule } from 'src/jogadores/jogadores.module';
 
 @Module({
-    imports: [],
+    imports: [MongooseModule.forFeature([{name: 'Categoria', schema: CategoriaSchema}]), JogadoresModule],
     controllers: [CategoriasController,],
     providers: [CategoriasService,],
 })
